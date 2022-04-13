@@ -11,12 +11,22 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: [php7.4, php8.0, php8.1]
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
     - name: Build and push Docker images
       uses: docker/build-push-action@v2.10.0
       with:
-        file: Dockerfile.php7.4
-        # List of tags
-        tags: wheatstalk/wordpress-bakery:php7.4
+        push: true
+        file: Dockerfile.${{ matrix.tag }}
+        tags: wheatstalk/wordpress-bakery:${{ matrix.tag }}
